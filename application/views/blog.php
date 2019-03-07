@@ -146,39 +146,7 @@ if($key == 'logo'){
 		<div class="container">
 			<div class="row">
 				<div class="col-sm-6 offset-sm-3">
-					<nav aria-label="Page navigation example">
-						<ul class="pagination">
-							<?php 
-								if($tranghientai == 1){
-
-								}else{
-									?>
-										<li class="page-item prev"><a class="page-link" href="?= base_url()?>Tintuc/page/<?= $tranghientai - 1 ?>">Previous</a></li>
-									<?php
-								}
-
-							 ?>
-							
-							<?php for ($i = 0;  $i < $sotrang; $i++) { ?>
-								<?php if ($tranghientai == ($i+1)){ ?>
-									<li class="page-item current"><a class="page-link" href="<?= base_url()?>Tintuc/page/<?= $i+1 ?>"><?= $i+1 ?></a></li>
-								<?php }else{ ?>
-									<li class="page-item"><a class="page-link" href="<?= base_url()?>Tintuc/page/<?= $i+1 ?>"><?= $i+1 ?></a></li>
-								<?php } ?>
-							<?php }	?>
-							<?php 
-								if ($tranghientai == $sotrang) {
-									
-								}else{
-									?>
-										<li class="page-item next"><a class="page-link" href="<?= base_url()?>Tintuc/page/<?= $tranghientai + 1 ?>">Next</a></li>
-									<?php
-								}
-
-							 ?>
-
-						</ul>
-					</nav>
+					<?php echo $this->pagination->create_links(); ?>
 				</div>
 			</div> <!-- row -->
 		</div> <!-- container -->

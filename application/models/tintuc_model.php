@@ -104,45 +104,15 @@ class tintuc_model extends CI_Model {
 		return $this->db->delete('tintuc');
 	}
 
-	public function getAllTin($sotintrong1trang)
+	public function getAllTin()
 	{
 		$this->db->select('*');
 		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
 		$this->db->order_by('ngaytao', 'desc');
-		$data = $this->db->get('danhmuctin', $sotintrong1trang, 0);
+		$data = $this->db->get('danhmuctin');
 		return $data = $data->result_array();
 	}
-	public function soTrangTin($sotintrong1trang)
-	{
-		$this->db->select('*');
-		$data = $this->db->get('tintuc');
-		$data = $data->result_array();
-
-		$soluongtin = count($data);
-		// làm tròn bằng round,ceil
-		$sotrang = ceil($soluongtin / $sotintrong1trang);
-
-		return $sotrang;
-	}
-	public function getTinTheoTrang($sotrang, $sotintrong1trang){
-		$this->db->select('*');
-		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
-		$this->db->order_by('ngaytao', 'desc');
-		//Tính vị trí tin tiếp theo bắt đầu từ trang thứ mấy... 
-		$offset = ($sotrang - 1) * $sotintrong1trang;
-
-		$data = $this->db->get('danhmuctin', $sotintrong1trang, $offset);
-		return $data = $data->result_array();
-	}
-	public function getTinTheoDanhMuc($sotintrong1trang, $id){
-		$this->db->select('*');
-		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
-		$this->db->where('tintuc.iddanhmuc', $id);
-		$this->db->order_by('ngaytao', 'desc');
-
-		$data = $this->db->get('danhmuctin', $sotintrong1trang, 0);
-		return $data = $data->result_array();
-	}
+	
 	public function getIdDanhMucById($id)
 	{
 		$this->db->select('*');
@@ -222,10 +192,38 @@ class tintuc_model extends CI_Model {
 	{
 		$this->db->select('*');
 		$this->db->like('tieude', $keyword, 'BOTH');
+		$this->db->or_like('trichdan', $keyword,'BOTH');
 		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
 		$this->db->order_by('ngaytao', 'desc');
 		$result = $this->db->get('danhmuctin', $sotintrong1trang, 0);
         return $result = $result->result_array();
+	}
+
+	public function total_rows()
+    {
+    	return $this->db->count_all('tintuc');	
+    }
+    public function pagination($limit, $offset)
+    {
+    	$this->db->select('*');
+		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
+		$this->db->order_by('ngaytao', 'desc');
+    	$result = $this->db->get('danhmuctin', $limit, $offset);
+    	return $result = $result->result_array();
+    }
+    public function getTinTheoDanhMuc($id, $limit, $offset){
+		$this->db->select('*');
+		$this->db->join('tintuc', 'tintuc.iddanhmuc = danhmuctin.id', 'left');
+		$this->db->where('tintuc.iddanhmuc', $id);
+		$this->db->order_by('ngaytao', 'desc');
+    	$result = $this->db->get('danhmuctin',$limit, $offset);
+    	return $result = $result->result_array();
+	}
+	public function total_rows_danhmuc($id)
+	{	
+		$this->db->select('*');
+		$this->db->where('iddanhmuc', $id);
+		return $this->db->get('tintuc')->num_rows();
 	}
 }
 

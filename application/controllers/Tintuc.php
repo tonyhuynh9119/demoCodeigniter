@@ -11,17 +11,45 @@ class Tintuc extends CI_Controller {
 		$this->sotintrong1trang = 3;
 	}
 
-	public function index()
+	public function index($offset = 0)
 	{
-		$tt_tin = $this->tintuc_model->getAllTin($this->sotintrong1trang);
-		$sotrang = $this->tintuc_model->soTrangTin($this->sotintrong1trang);
+		$total_rows = $this->tintuc_model->total_rows();
+		$limit = 3;
+		$pagination = $this->tintuc_model->pagination($limit, $offset);
+
+		$this->load->library('pagination');
+		
+		$config['base_url'] = base_url(). 'Tintuc/index'; //đường dẫn phân trang
+		$config['total_rows'] = $total_rows; //tổng số bản ghi
+		$config['per_page'] = $limit; //giới hạn bản ghi trong 1 trang
+		$config['uri_segment'] = 0; //Cho phep bỏ qua bản ghi từ vị trí
+		$config['num_links'] = 2; //Hiển thị bao nhiêu số trang
+
+		$config['full_tag_open'] = '<nav aria-label="Page navigation example"><ul class="pagination">';
+		$config['full_tag_close'] = '</ul></nav>';
+		$config['first_link'] = 'First';
+		$config['first_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['first_tag_close'] = '</div></li>';
+		$config['last_link'] = 'End';
+		$config['last_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['last_tag_close'] = '</div></li>';
+		$config['next_link'] = '&raquo;';
+		$config['next_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['next_tag_close'] = '</div></li>';
+		$config['prev_link'] = '&laquo;';
+		$config['prev_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['prev_tag_close'] = '</div></li>';
+		$config['cur_tag_open'] = '<li class="page-item active"><div class="page-link">';
+		$config['cur_tag_close'] = '</div></li>';
+		$config['num_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['num_tag_close'] = '</div></li>';
+
+		$this->pagination->initialize($config);
+
+
 		$danhmuctin = $this->tintuc_model->viewDanhMuc();
 		$laybatinmoinhat = $this->tintuc_model->laybatinmoinhat();
 
-
-		// echo '<pre>';
-		// var_dump($laybatinmoinhat);die();
-		// echo '</pre>';
 		$dataHeader = $this->tintuc_model->layQuanLyHeader();
 		$dataHeader = json_decode($dataHeader,true);
 		$dataMenuHeader = $this->slides_model->laydulieutuMenuHeader();
@@ -29,52 +57,17 @@ class Tintuc extends CI_Controller {
 		$dataFooter = $this->tintuc_model->laydlquanlyfooter();
 		$dataFooter = json_decode($dataFooter, true);
 
-		// $obj = [
-		// 	'username' => 'admin',
-		// 	'password' => '123456'
-		// ];
-		// $this->session->set_userdata($obj);
-
-		// $this->session->unset_userdata('username','password');
-
 		$data = [
-			'tt_tin' => $tt_tin,
+			'tt_tin' => $pagination,
 			'laybatinmoinhat' => $laybatinmoinhat,
 			'dataHeader' => $dataHeader,
 			'dataMenuHeader' => $dataMenuHeader,
 			'dataFooter' => $dataFooter,
-			'sotrang' => $sotrang,
 			'danhmuctin' => $danhmuctin
 		];
 		$this->load->view('blog', $data, false);	
 	}
-	public function page($sotrang)
-	{
-		$tt_tin = $this->tintuc_model->getTinTheoTrang($sotrang, $this->sotintrong1trang);
-		$sotrang = $this->tintuc_model->soTrangTin($this->sotintrong1trang);
-		$danhmuctin = $this->tintuc_model->viewDanhMuc();
-		$laybatinmoinhat = $this->tintuc_model->laybatinmoinhat();
-
-		$dataHeader = $this->tintuc_model->layQuanLyHeader();
-		$dataHeader = json_decode($dataHeader,true);
-		$dataMenuHeader = $this->slides_model->laydulieutuMenuHeader();
-		$dataMenuHeader = json_decode($dataMenuHeader, true);
-		$dataFooter = $this->tintuc_model->laydlquanlyfooter();
-		$dataFooter = json_decode($dataFooter, true);
-		
-
-		$data = [
-			'tt_tin' => $tt_tin,
-			'laybatinmoinhat' => $laybatinmoinhat,
-			'dataHeader' => $dataHeader,
-			'dataMenuHeader' => $dataMenuHeader,
-			'dataFooter' => $dataFooter,
-			'sotrang' => $sotrang,
-			'danhmuctin' => $danhmuctin
-		];
-		$this->load->view('blog', $data, false);
-
-	}
+	
 	public function chiTietTinTuc($idtin){
 		$data = $this->tintuc_model->getByIdTin($idtin);
 		$danhmuctin = $this->tintuc_model->viewDanhMuc();
@@ -90,9 +83,40 @@ class Tintuc extends CI_Controller {
 		];
 		$this->load->view('blog_details',$data, false);
 	}
-	public function danhmuc($id){
-		$tt_tin = $this->tintuc_model->getTinTheoDanhMuc($this->sotintrong1trang, $id);
-		$sotrang = $this->tintuc_model->soTrangTin($this->sotintrong1trang);
+	public function danhmuc($id, $offset = 0){
+		$total_rows = $this->tintuc_model->total_rows_danhmuc($id);
+		$limit = 3;
+		$pagination = $this->tintuc_model->getTinTheoDanhMuc($id, $limit, $offset);
+
+		$this->load->library('pagination');
+		
+		$config['base_url'] = base_url(). 'Tintuc/danhmuc/'. $id .'/index'; //đường dẫn phân trang
+		$config['total_rows'] = $total_rows; //tổng số bản ghi
+		$config['per_page'] = $limit; //giới hạn bản ghi trong 1 trang
+		$config['uri_segment'] = 0; //Cho phep bỏ qua bản ghi từ vị trí
+		$config['num_links'] = 2; //Hiển thị bao nhiêu số trang
+
+		$config['full_tag_open'] = '<nav aria-label="Page navigation example"><ul class="pagination">';
+		$config['full_tag_close'] = '</ul></nav>';
+		$config['first_link'] = 'Fisrt';
+		$config['first_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['first_tag_close'] = '</div></li>';
+		$config['last_link'] = 'End';
+		$config['last_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['last_tag_close'] = '</div></li>';
+		$config['next_link'] = '&raquo;';
+		$config['next_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['next_tag_close'] = '</div></li>';
+		$config['prev_link'] = '&laquo;';
+		$config['prev_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['prev_tag_close'] = '</div></li>';
+		$config['cur_tag_open'] = '<li class="page-item active"><div class="page-link">';
+		$config['cur_tag_close'] = '</div></li>';
+		$config['num_tag_open'] = '<li class="page-item"><div class="page-link">';
+		$config['num_tag_close'] = '</div></li>';
+
+		$this->pagination->initialize($config);
+
 		$danhmuctin = $this->tintuc_model->viewDanhMuc();
 		$laybatinmoinhat = $this->tintuc_model->laybatinmoinhat();
 
@@ -104,12 +128,11 @@ class Tintuc extends CI_Controller {
 		$dataFooter = json_decode($dataFooter, true);
 
 		$data = [
-			'tt_tin' => $tt_tin,
+			'tt_tin' => $pagination,
 			'laybatinmoinhat' => $laybatinmoinhat,
 			'dataHeader' => $dataHeader,
 			'dataMenuHeader' => $dataMenuHeader,
 			'dataFooter' => $dataFooter,
-			'sotrang' => $sotrang,
 			'danhmuctin' => $danhmuctin
 		];
 		
